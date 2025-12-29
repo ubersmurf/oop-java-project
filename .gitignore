@@ -12,6 +12,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.iml
+.metadata/
 
 # Build directories
 out/
