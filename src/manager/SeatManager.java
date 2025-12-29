@@ -48,8 +48,11 @@ public class SeatManager {
     public boolean bookSeat(Flight flight, int row, int col) {
         Plane plane = flight.getPlane();
         Seat seat = plane.getSeat(row, col);
-
-        if (seat != null && !seat.isOccupied()) {
+        // olmayan koltuk için Exception fırlatılıyor 2.b seatmanagertest için
+        if (seat == null) {
+            throw new IllegalArgumentException("Hata: Böyle bir koltuk numarası yok! (" + row + "," + col + ")");
+        }
+        if (!seat.isOccupied()) {
             seat.reserve();
             return true;
         }

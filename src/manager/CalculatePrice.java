@@ -25,4 +25,5 @@ public class CalculatePrice {
         }
         return 0.0;
     }
+
 }
