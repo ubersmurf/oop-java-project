@@ -1,4 +1,4 @@
-/*package manager;
+package manager;
 
 import model.Flight;
 import model.Plane;
@@ -23,9 +23,9 @@ class FlightManagerTest {
         testPlane = new Plane("P001", "Boeing 737", 100);
     }
 
-    /**
+    /*
      * PDF İsteği 1: "Test the system to filter and retrieve the correct flights
-     * for the given departure/arrival cities."
+     * for the given departure/arrival cities."*/
 
     @Test
     void testSearchFlight_FiltersByCityCorrectly() {
@@ -50,9 +50,8 @@ class FlightManagerTest {
         assertTrue(wrongResults.isEmpty(), "Eşleşmeyen rotada uçuş dönmemeliydi.");
     }
 
-    /**
-     * PDF İsteği 2: "Test the process of eliminating flights whose departure time has passed."
-
+    /*
+     * PDF İsteği 2: "Test the process of eliminating flights whose departure time has passed."*/
     @Test
     void testSearchFlight_EliminatesPassedFlights() {
         // 1. Hazırlık: Biri GEÇMİŞ, biri GELECEK tarihli iki uçuş oluştur
@@ -83,4 +82,4 @@ class FlightManagerTest {
         cal.add(Calendar.DAY_OF_MONTH, days);
         return cal.getTime();
     }
-}*/
+}
