@@ -1,4 +1,4 @@
-package flightmanagement;
+package model;
 
 import java.io.Serializable;
 

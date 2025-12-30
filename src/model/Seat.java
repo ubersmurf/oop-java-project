@@ -1,44 +1,39 @@
 package model;
 
+import flightmanagement.SeatType;
+
 import java.io.Serializable;
 
 public class Seat implements Serializable {
-    private String seatNum;
-
-
-    private SeatType type;
-    private boolean isOccupied;
+    private String seatNum; // Örn: "1A"
+    private flightmanagement.SeatType type;
     private double price;
+    private boolean isOccupied;
 
-    public Seat(String seatNum, SeatType type, double price) {
+    public Seat(String seatNum, flightmanagement.SeatType type, double price) {
         this.seatNum = seatNum;
         this.type = type;
         this.price = price;
-        this.isOccupied = false; 
+        this.isOccupied = false;
     }
 
-    public String getSeatNum() {
-        return seatNum;
+    public void reserve() {
+        this.isOccupied = true;
     }
 
-    public void setSeatNum(String seatNum) {
-        this.seatNum = seatNum;
+    public void cancel() {
+        this.isOccupied = false;
     }
-
 
     public boolean isOccupied() {
         return isOccupied;
     }
 
-    public void setOccupied(boolean occupied) {
-        isOccupied = occupied;
-    }
-
-    public SeatType getType() {
-        return type;
-    }
-    
-    public double getPrice() {
-        return price;
+    // Getterlar
+    public String getSeatNum() { return seatNum; }
+    public SeatType getType() { return type; }
+    public double getPrice() { return price; }
+    public void setSeatNum(String seatNum) {
+        this.seatNum = seatNum;
     }
 }
