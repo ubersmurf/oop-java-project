@@ -3,12 +3,12 @@ package manager;
 import model.Flight;
 import model.Plane;
 import model.Seat;
-import flightmanagement.SeatType;
+import model.SeatType; // DÜZELTME: Artık model paketinden çekiyoruz
 
 public class SeatManager {
 
     /**
-     * UML [cite: 65] gereği koltuk planını oluşturur.
+     * [cite_start]UML [cite: 65] gereği koltuk planını oluşturur.
      * Kapasiteye göre satır sayısını belirler, standart 6 sütun (A-F) kullanır.
      */
     public Seat[][] createSeatPlan(Plane plane) {
@@ -48,7 +48,8 @@ public class SeatManager {
     public boolean bookSeat(Flight flight, int row, int col) {
         Plane plane = flight.getPlane();
         Seat seat = plane.getSeat(row, col);
-        // olmayan koltuk için Exception fırlatılıyor 2.b seatmanagertest için
+
+        // olmayan koltuk için Exception fırlatılıyor (PDF 2.b gereği)
         if (seat == null) {
             throw new IllegalArgumentException("Hata: Böyle bir koltuk numarası yok! (" + row + "," + col + ")");
         }
