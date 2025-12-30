@@ -13,7 +13,7 @@ public class ReservationManager {
     private List<Reservation> reservations;
     private List<Ticket> tickets; // Biletleri de saklayalım
     private CalculatePrice priceCalculator;
-    private final String RES_FILE = "reservations.dat"; // Kayıt dosyası
+    private final String RES_FILE = "data/reservations.dat"; // Kayıt dosyası
 
     public ReservationManager() {
         this.priceCalculator = new CalculatePrice();
@@ -81,13 +81,19 @@ public class ReservationManager {
     }
 
     // ================= DOSYA İŞLEMLERİ (File I/O) =================
-    
+
     private void saveData() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(RES_FILE))) {
-            oos.writeObject(reservations);
-            oos.writeObject(tickets);
-            // Not: Flight ve Seat durumlarını da FlightManager kaydetmeli.
-            // Biz burada sadece rezervasyonları saklıyoruz.
+        try {
+            // Önce klasör var mı kontrol et, yoksa oluştur
+            File file = new File(RES_FILE);
+            if (file.getParentFile() != null && !file.getParentFile().exists()) {
+                file.getParentFile().mkdirs(); // "data" klasörünü yaratır
+            }
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                oos.writeObject(reservations);
+                oos.writeObject(tickets);
+            }
         } catch (IOException e) {
             System.out.println("Dosya kaydetme hatası: " + e.getMessage());
         }
