@@ -1,7 +1,7 @@
 package manager;
 
-import flightmanagement.Flight;
-import flightmanagement.Plane;
+import model.Flight;
+import model.Plane;
 
 import java.io.*;
 import java.util.*;

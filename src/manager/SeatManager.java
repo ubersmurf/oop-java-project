@@ -1,8 +1,8 @@
 package manager;
 
-import flightmanagement.Flight;
-import flightmanagement.Plane;
-import flightmanagement.Seat;
+import model.Flight;
+import model.Plane;
+import model.Seat;
 import flightmanagement.SeatType;
 
 public class SeatManager {
