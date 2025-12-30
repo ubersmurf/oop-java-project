@@ -8,7 +8,8 @@ import java.util.*;
 
 public class FlightManager {
     private List<Flight> flights;
-    private final String DATA_FILE = "flights.dat"; // Dosya işlemleri için
+    // Dosya yolunu 'data' klasörü içine yönlendirdik
+    private final String DATA_FILE = "data/flights.dat";
 
     public FlightManager() {
         this.flights = new ArrayList<>();
@@ -33,6 +34,7 @@ public class FlightManager {
             saveFlightsToFile();
         }
     }
+
     public boolean updateFlightTime(String flightNum, Date newDate, Date newHour) {
         Flight flight = getFlight(flightNum);
         if (flight != null) {
@@ -45,6 +47,7 @@ public class FlightManager {
         System.out.println("Güncelleme başarısız: Uçuş bulunamadı.");
         return false;
     }
+
     public boolean updateFlightDuration(String flightNum, int newDuration) {
         Flight flight = getFlight(flightNum);
         if (flight != null) {
@@ -55,6 +58,7 @@ public class FlightManager {
         }
         return false;
     }
+
     public boolean updateFlightPlane(String flightNum, Plane newPlane) {
         Flight flight = getFlight(flightNum);
         if (flight != null) {
@@ -65,7 +69,6 @@ public class FlightManager {
         }
         return false;
     }
-
 
     public Flight getFlight(String flightNum) {
         for (Flight f : flights) {
@@ -78,7 +81,6 @@ public class FlightManager {
 
     /**
      * Kalkış, varış ve tarihe göre uçuş arama.
-     * java.util.Date kullanıldığı için gün kontrolü yapılır.
      */
     public List<Flight> searchFlight(String dep, String arr, Date date) {
         List<Flight> result = new ArrayList<>();
@@ -107,6 +109,7 @@ public class FlightManager {
     @SuppressWarnings("unchecked")
     public void loadFlightsFromFile() {
         File file = new File(DATA_FILE);
+        // Eğer dosya yoksa (henüz veri girilmediyse) metoddan çık
         if (!file.exists()) return;
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -119,9 +122,18 @@ public class FlightManager {
         }
     }
 
+    // --- DÜZELTİLEN METOT BURADA (ESKİSİ SİLİNDİ) ---
     public void saveFlightsToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
-            oos.writeObject(flights);
+        try {
+            File file = new File(DATA_FILE);
+            // Eğer "data" klasörü yoksa, önce onu oluştur
+            if (file.getParentFile() != null && !file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                oos.writeObject(flights);
+            }
         } catch (IOException e) {
             System.out.println("Veri kaydedilemedi: " + e.getMessage());
         }
