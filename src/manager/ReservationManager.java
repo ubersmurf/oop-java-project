@@ -19,38 +19,68 @@ public class ReservationManager {
         this.priceCalculator = new CalculatePrice();
         this.reservations = new ArrayList<>();
         this.tickets = new ArrayList<>();
-        loadData(); // Program açılınca eski kayıtları yükle
+
+        // --- DÜZELTME BURADA ---
+        // Sadece "data" klasörünün varlığını kontrol ediyoruz.
+        // Dosya ismini karıştırmıyoruz.
+        File dataDir = new File("../../data");
+        if (!dataDir.exists()) {
+            dataDir.mkdir(); // data klasörü yoksa oluştur
+        }
+
+        loadData(); // Eski verileri çek
     }
 
-    // PDF Madde 19: Concurrency (Eşzamanlılık) için 'synchronized' ekledik.
-    // Aynı anda iki kişi aynı koltuğu alamasın diye.
-    public synchronized boolean makeReservation(Passenger passenger, Flight flight, Seat seat, double basePrice) {
-        // 1. Koltuk Kontrolü
+// GÜNCELLENMİŞ makeReservation Metodu (PDF Senaryo 1 Uyumu İçin)
+    public boolean makeReservation(Passenger passenger, Flight flight, Seat seat, double basePrice, boolean isThreadSafe) {
+        
+        if (isThreadSafe) {
+            // GÜVENLİ MOD: synchronized bloğu kullanılır
+            // Aynı anda sadece 1 thread buraya girebilir
+            synchronized (this) {
+                return applyReservation(passenger, flight, seat, basePrice);
+            }
+        } else {
+            // GÜVENSİZ MOD: synchronized yok! [cite: 26]
+            // Aynı anda 2 kişi aynı koltuğu almaya çalışabilir (Race Condition)
+            return applyReservation(passenger, flight, seat, basePrice);
+        }
+    }
+
+    private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, double basePrice) {
+        // 1. Koltuk kontrolü
         if (seat.isOccupied()) {
-            System.out.println("Koltuk dolu: " + seat.getSeatNum());
             return false;
         }
 
-        // 2. Fiyat Hesapla
+        // Simülasyon gecikmesi (Thread çakışması yaratmak için)
+        try { Thread.sleep(10); } catch (InterruptedException e) {}
+
+        // 2. Fiyatı Hesapla
         double price = priceCalculator.calculate(seat, basePrice);
-
-        // 3. ID Üretimi
-        String resCode = "PNR-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        String ticketID = "TKT-" + UUID.randomUUID().toString().substring(0, 8);
-
+        
+        // 3. Rezervasyon Kodunu Üret
+        String pnr = "PNR-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        
         // 4. Nesneleri Oluştur
-        Reservation newRes = new Reservation(resCode, flight, passenger, seat);
-        Ticket newTicket = new Ticket(ticketID, newRes, price);
-
-        // 5. Kayıt ve Koltuk Kapama
+        Reservation newRes = new Reservation(pnr, flight, passenger, seat);
+        
+        // --- DÜZELTME BURADA ---
+        // Hesapladığımız 'price' değerini burada Ticket oluştururken kullanıyoruz!
+        String ticketId = "TKT-" + UUID.randomUUID().toString().substring(0, 8);
+        Ticket newTicket = new Ticket(ticketId, newRes, price);
+        
+        // 5. Listelere Ekle (Manager sınıfının tepesinde 'tickets' listesi tanımlı olmalı)
         reservations.add(newRes);
         tickets.add(newTicket);
-        seat.setOccupied(true);
-
-        System.out.println("Rezervasyon yapıldı. Kod: " + resCode + " | Fiyat: " + price);
         
-        // 6. Dosyaya Kalıcı Kaydet
+        seat.setOccupied(true); // Koltuğu doldur
+        
+        // Konsola bilgi verelim ki çalıştığını görelim
+        System.out.println("İşlem Başarılı: " + pnr + " | Fiyat: " + price + " TL");
+
         saveData();
+        
         return true;
     }
 
