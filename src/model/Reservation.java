@@ -16,6 +16,26 @@ public class Reservation implements Serializable {
     private LocalDateTime dateOfReservation; // İşlem ne zaman yapıldı?
     private boolean isActive;            // İptal edildi mi? (true: aktif, false: iptal)
 
+    public void setReservationCode(String reservationCode) {
+        this.reservationCode = reservationCode;
+    }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+
+    public void setPassenger(Passenger passenger) {
+        this.passenger = passenger;
+    }
+
+    public void setSeat(Seat seat) {
+        this.seat = seat;
+    }
+
+    public void setDateOfReservation(LocalDateTime dateOfReservation) {
+        this.dateOfReservation = dateOfReservation;
+    }
+
     // Yapıcı Metot (Constructor)
     public Reservation(String reservationCode, Flight flight, Passenger passenger, Seat seat) {
         this.reservationCode = reservationCode;

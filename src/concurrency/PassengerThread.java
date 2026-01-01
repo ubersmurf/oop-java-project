@@ -4,43 +4,55 @@ import manager.ReservationManager;
 import model.Flight;
 import model.Passenger;
 import model.Seat;
+
 import java.util.List;
 import java.util.Random;
 
 public class PassengerThread implements Runnable {
-    
     private ReservationManager manager;
     private Flight flight;
-    private List<Seat> seats; // Uçaktaki tüm koltuk listesi
+    private List<Seat> seats;
     private Passenger passenger;
-    private boolean isThreadSafe; // Güvenli mod açık mı?
+    private boolean isGuvenliMod;
+    private Random random;
 
-    public PassengerThread(ReservationManager manager, Flight flight, List<Seat> seats, Passenger passenger, boolean isThreadSafe) {
+    public PassengerThread(ReservationManager manager, Flight flight, List<Seat> seats, Passenger passenger, boolean isGuvenliMod) {
         this.manager = manager;
         this.flight = flight;
         this.seats = seats;
         this.passenger = passenger;
-        this.isThreadSafe = isThreadSafe;
+        this.isGuvenliMod = isGuvenliMod;
+        this.random = new Random();
     }
 
     @Override
     public void run() {
-        // PDF Madde 21: Rastgele koltuk seçimi
-        Random random = new Random();
-        if (seats.isEmpty()) return;
-
-        // Rastgele bir koltuk seç
-        Seat randomSeat = seats.get(random.nextInt(seats.size()));
-
-        // Seçilen koltuk için rezervasyon yapmayı dene
-        // Not: isThreadSafe parametresini manager'a iletiyoruz
-        manager.makeReservation(passenger, flight, randomSeat, 1000.0, isThreadSafe);
-        
-        try {
-            // İşlemi biraz yavaşlat ki ekranda görelim (Simülasyon hissi)
-            Thread.sleep(50); 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (isGuvenliMod) {
+            // --- GÜVENLİ MOD (Synchronized) ---
+            // KURAL: Yolcu mutlaka bir koltuk almalı (90'da 90 hedefini tutturmak için)
+            boolean basardi = false;
+            
+            while (!basardi) {
+                // 1. Rastgele bir koltuk seç
+                Seat randomSeat = seats.get(random.nextInt(seats.size()));
+                
+                // 2. Rezervasyon yapmayı dene
+                // Eğer koltuk doluysa manager 'false' döner, döngü devam eder.
+                basardi = manager.makeReservation(passenger, flight, randomSeat, 1000.0, true);
+                
+                // Çok hızlı döngüye girip CPU'yu yormasın diye minik bir bekleme
+                if (!basardi) {
+                    try { Thread.sleep(5); } catch (InterruptedException e) {}
+                }
+            }
+            
+        } else {
+            // --- GÜVENSİZ MOD (Non-Synchronized) ---
+            // KURAL: Hatalı yerleşimleri görmek istiyoruz.
+            // Yolcu rastgele bir yere saldırır. Şansına ne çıkarsa.
+            
+            Seat randomSeat = seats.get(random.nextInt(seats.size()));
+            manager.makeReservation(passenger, flight, randomSeat, 1000.0, false);
         }
     }
 }

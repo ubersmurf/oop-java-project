@@ -23,12 +23,23 @@ public class ReservationManager {
         // --- DÜZELTME BURADA ---
         // Sadece "data" klasörünün varlığını kontrol ediyoruz.
         // Dosya ismini karıştırmıyoruz.
-        File dataDir = new File("../../data");
+        File dataDir = new File(RES_FILE);
         if (!dataDir.exists()) {
             dataDir.mkdir(); // data klasörü yoksa oluştur
         }
 
         loadData(); // Eski verileri çek
+    }
+
+    public List<Reservation> getAllReservations() {
+        return reservations;
+    }
+
+    public void removeAllReservations() {
+        reservations.clear();
+        tickets.clear();
+        saveData(); // Boş listeyi dosyaya yazar, böylece dosya sıfırlanır
+        System.out.println("Veritabanı tamamen temizlendi.");
     }
 
 // GÜNCELLENMİŞ makeReservation Metodu (PDF Senaryo 1 Uyumu İçin)
