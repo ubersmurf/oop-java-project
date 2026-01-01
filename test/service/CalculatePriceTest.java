@@ -7,35 +7,63 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CalculatePriceTest {
 
+    // 1. TEST: Business Class Fiyat Hesaplama
     @Test
-    void testBusinessClassPriceCalculation() {
-        // 1. Hazırlık (Arrange)
+    void testCalculate_BusinessClass() {
+        // Hazırlık
         CalculatePrice calculator = new CalculatePrice();
-        // Business koltuk oluşturuyoruz (ID: 1A, Tip: BUSINESS, Taban Fiyat: 0)
+        // Fiyatı etkilemeyen parametreleri boş geçebiliriz (null), önemli olan SeatType
         Seat businessSeat = new Seat("1A", SeatType.BUSINESS, 0); 
-        double baseFlightPrice = 1000.0;
+        double basePrice = 1000.0;
 
-        // 2. İşlem (Act)
-        // Senin kodunda Business ne kadar artırıyorsa (örn: 2.5 katı) ona göre hesaplat
-        double calculatedPrice = calculator.calculate(businessSeat, baseFlightPrice);
+        // İşlem
+        double result = calculator.calculate(businessSeat, basePrice);
 
-        // 3. Doğrulama (Assert)
-        // Beklenen: 1000 * 2.5 = 2500.0 (Kendi CalculatePrice mantığına göre burayı güncelle!)
-        assertEquals(2500.0, calculatedPrice, "Business sınıf fiyatı yanlış hesaplandı!");
+        // Doğrulama (1000 * 2.5 = 2500 olmalı)
+        assertEquals(2500.0, result, "Business koltuk fiyatı yanlış hesaplandı (2.5 katı olmalı).");
     }
 
+    // 2. TEST: Economy Class Fiyat Hesaplama
     @Test
-    void testEconomyClassPriceCalculation() {
-        // 1. Hazırlık
+    void testCalculate_EconomyClass() {
+        // Hazırlık
         CalculatePrice calculator = new CalculatePrice();
-        Seat economySeat = new Seat("1B", SeatType.ECONOMY, 0);
-        double baseFlightPrice = 1000.0;
+        Seat economySeat = new Seat("10A", SeatType.ECONOMY, 0);
+        double basePrice = 1000.0;
 
-        // 2. İşlem
-        double calculatedPrice = calculator.calculate(economySeat, baseFlightPrice);
+        // İşlem
+        double result = calculator.calculate(economySeat, basePrice);
 
-        // 3. Doğrulama
-        // Ekonomi fiyatı taban fiyatla aynı kalmalı
-        assertEquals(1000.0, calculatedPrice, "Ekonomi sınıf fiyatı hatalı!");
+        // Doğrulama (1000 * 1 = 1000 olmalı)
+        assertEquals(1000.0, result, "Economy koltuk fiyatı değişmemeli, taban fiyat kalmalı.");
+    }
+
+    // 3. TEST: Bagaj Ücreti (Sınırın Altında)
+    @Test
+    void testCalculateBaggageFee_UnderLimit() {
+        // Hazırlık
+        CalculatePrice calculator = new CalculatePrice();
+        double weight = 20.0; // 23kg altı
+
+        // İşlem
+        double fee = calculator.calculateBaggageFee(weight);
+
+        // Doğrulama (0 TL olmalı)
+        assertEquals(0.0, fee, "23kg altındaki bagaj için ücret alınmamalı.");
+    }
+
+    // 4. TEST: Bagaj Ücreti (Sınırın Üstünde)
+    @Test
+    void testCalculateBaggageFee_OverLimit() {
+        // Hazırlık
+        CalculatePrice calculator = new CalculatePrice();
+        double weight = 25.0; // 23kg'dan 2 kilo fazla
+
+        // İşlem
+        double fee = calculator.calculateBaggageFee(weight);
+
+        // Doğrulama 
+        // Formülün: (25 - 23) * 150 = 2 * 150 = 300 TL
+        assertEquals(300.0, fee, "Fazla bagaj ücreti yanlış hesaplandı.");
     }
 }

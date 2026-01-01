@@ -34,6 +34,10 @@ public class FlightManager {
             saveFlightsToFile();
         }
     }
+    
+    public List<Flight> getAllFlights() {
+        return flights;
+    }
 
     public boolean updateFlightTime(String flightNum, Date newDate, Date newHour) {
         Flight flight = getFlight(flightNum);
@@ -46,6 +50,17 @@ public class FlightManager {
         }
         System.out.println("Güncelleme başarısız: Uçuş bulunamadı.");
         return false;
+    }
+
+    public void updateFlightSeats(Flight updatedFlight) {
+        for (int i = 0; i < flights.size(); i++) {
+            // ID eşleşiyorsa, listedeki eski uçuşu yenisiyle değiştir
+            if (flights.get(i).getFlightNum().equals(updatedFlight.getFlightNum())) {
+                flights.set(i, updatedFlight);
+                break;
+            }
+        }
+        saveFlightsToFile(); // Dosyaya kalıcı olarak kaydet (flights.dat)
     }
 
     public boolean updateFlightDuration(String flightNum, int newDuration) {

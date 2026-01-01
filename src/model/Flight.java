@@ -11,6 +11,23 @@ public class Flight implements Serializable {
     private String arrivalPlace;
     private Date date; // Tarih
     private Date hour; // Saat (Sadece zaman bilgisini tutacak)
+    
+    public void setDeparturePlace(String departurePlace) {
+        this.departurePlace = departurePlace;
+    }
+
+    public void setArrivalPlace(String arrivalPlace) {
+        this.arrivalPlace = arrivalPlace;
+    }
+
+    public Date getHour() {
+        return hour;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
     private int duration; // Dakika cinsinden
     private Plane plane;
 
