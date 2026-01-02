@@ -3,13 +3,10 @@ package gui;
 import manager.ReservationManager;
 import model.Reservation;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ReservationFrame extends JFrame {
@@ -19,19 +16,18 @@ public class ReservationFrame extends JFrame {
     private DefaultTableModel tableModel;
     private ReservationManager reservationManager;
 
-// Constructor'ı değiştirdik: Artık kimin açtığını soruyor (isAdmin)
     public ReservationFrame(boolean isAdmin) {
         reservationManager = new ReservationManager();
 
         setTitle("YTÜ Havayolu - Rezervasyon Yönetimi" + (isAdmin ? " (Yönetici Modu)" : ""));
-        setSize(800, 500);
+        setSize(850, 500); // Biraz genişlettim rahat sığsın
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
         // --- ÜST PANEL ---
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
-        searchPanel.setBackground(isAdmin ? new Color(192, 57, 43) : new Color(142, 68, 173)); // Admin kırmızı, Yolcu mor
+        searchPanel.setBackground(isAdmin ? new Color(192, 57, 43) : new Color(142, 68, 173));
 
         JLabel lblInfo = new JLabel("Yolcu ID veya PNR Kodu:");
         lblInfo.setForeground(Color.WHITE);
@@ -48,10 +44,19 @@ public class ReservationFrame extends JFrame {
         add(searchPanel, BorderLayout.NORTH);
 
         // --- ORTA PANEL ---
-        String[] columns = {"ID", "Yolcu", "Uçuş", "Koltuk", "Tarih"};
-        tableModel = new DefaultTableModel(columns, 0);
+        // DEĞİŞİKLİK: PNR En başa alındı (Column 0)
+        String[] columns = {"PNR Kodu", "Yolcu Adı", "Uçuş No", "Koltuk", "Tarih"};
+        
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Tablo üzerinde elle düzenlemeyi kapatır
+            }
+        };
+        
         resTable = new JTable(tableModel);
         resTable.setRowHeight(25);
+        resTable.getTableHeader().setReorderingAllowed(false); // Sütunların yeri değişmesin
         add(new JScrollPane(resTable), BorderLayout.CENTER);
 
         // --- ALT PANEL ---
@@ -66,11 +71,9 @@ public class ReservationFrame extends JFrame {
         btnSearch.addActionListener(e -> searchReservation());
         btnCancel.addActionListener(e -> cancelReservation());
 
-        // --- KRİTİK AYRIM BURADA ---
         if (isAdmin) {
-            loadAllReservations(); // Admin ise her şeyi dök
+            loadAllReservations();
         } else {
-            // Yolcu ise boş gelsin, uyarı verelim
             JOptionPane.showMessageDialog(this, "Lütfen biletinizi görüntülemek için ID veya PNR giriniz.");
         }
     }
@@ -78,33 +81,32 @@ public class ReservationFrame extends JFrame {
     private void searchReservation() {
         String query = txtSearchPNR.getText().trim();
         if (query.isEmpty()) {
-            loadAllReservations(); 
+            loadAllReservations();
             return;
         }
 
         tableModel.setRowCount(0);
         List<Reservation> allRes = reservationManager.getAllReservations();
         boolean found = false;
-        
-        // YENİ FORMATLAYICI (LocalDateTime İçin)
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
         for (Reservation r : allRes) {
-            String pId = (r.getPassenger() != null) ? r.getPassenger().getPassengerID() : "N/A";
+            String pnr = r.getReservationCode();
+            String pId = (r.getPassenger() != null) ? r.getPassenger().getPassengerID() : "";
             String pName = (r.getPassenger() != null) ? r.getPassenger().getName() : "Bilinmiyor";
             String fNum = (r.getFlight() != null) ? r.getFlight().getFlightNum() : "-";
             String sNum = (r.getSeat() != null) ? r.getSeat().getSeatNum() : "-";
-            
-            // --- LocalDateTime KONTROLÜ ---
+
             String dateStr = "-";
             if (r.getDateOfReservation() != null) {
-                // LocalDateTime nesnesini formatlıyoruz
                 dateStr = r.getDateOfReservation().format(dtf);
             }
-            // -----------------------------
 
-            if (pId.contains(query)) {
-                Object[] row = { pId, pName, fNum, sNum, dateStr };
+            // Hem PNR hem ID içinde arama yapabilir
+            if (pnr.contains(query) || pId.contains(query)) {
+                // PNR en başta olacak şekilde satırı oluşturuyoruz
+                Object[] row = { pnr, pName, fNum, sNum, dateStr };
                 tableModel.addRow(row);
                 found = true;
             }
@@ -122,47 +124,46 @@ public class ReservationFrame extends JFrame {
             return;
         }
 
-        // Seçili ID'yi al (Tablonun 0. sütunu ID olsun dedik)
-        String resId = (String) tableModel.getValueAt(selectedRow, 0);
+        // DEĞİŞİKLİK: 0. Sütun artık PNR olduğu için burası DOĞRU ÇALIŞIR
+        String pnrCode = (String) tableModel.getValueAt(selectedRow, 0);
 
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bu rezervasyonu silmek istediğinize emin misiniz?", 
-            "İptal Onayı", JOptionPane.YES_NO_OPTION);
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Bu rezervasyonu (PNR: " + pnrCode + ") silmek istediğinize emin misiniz?",
+                "İptal Onayı", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            reservationManager.cancelReservation(resId);
+            reservationManager.cancelReservation(pnrCode); // Manager'a PNR gidiyor
+            
+            // Tablodan görsel olarak siliyoruz
             tableModel.removeRow(selectedRow);
-            JOptionPane.showMessageDialog(this, "İşlem (Simülasyon) Başarılı: Kayıt listeden kaldırıldı.");
+            
+            JOptionPane.showMessageDialog(this, "İşlem Başarılı: Rezervasyon silindi.");
         }
     }
 
     private void loadAllReservations() {
         tableModel.setRowCount(0);
         List<Reservation> allRes = reservationManager.getAllReservations();
-        
-        // YENİ FORMATLAYICI (LocalDateTime İçin)
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
         for (Reservation r : allRes) {
-            String pId = (r.getPassenger() != null) ? r.getPassenger().getPassengerID() : "N/A";
+            String pnr = r.getReservationCode();
             String pName = (r.getPassenger() != null) ? r.getPassenger().getName() : "Bilinmiyor";
             String fNum = (r.getFlight() != null) ? r.getFlight().getFlightNum() : "-";
             String sNum = (r.getSeat() != null) ? r.getSeat().getSeatNum() : "-";
 
-            // --- LocalDateTime KONTROLÜ ---
             String dateStr = "-";
             if (r.getDateOfReservation() != null) {
-                // LocalDateTime nesnesini formatlıyoruz
                 dateStr = r.getDateOfReservation().format(dtf);
             }
-            // -----------------------------
 
-            Object[] row = { pId, pName, fNum, sNum, dateStr };
+            // PNR en başta (Column 0)
+            Object[] row = { pnr, pName, fNum, sNum, dateStr };
             tableModel.addRow(row);
         }
     }
-    
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ReservationFrame(false).setVisible(true));
+        SwingUtilities.invokeLater(() -> new ReservationFrame(true).setVisible(true));
     }
 }
