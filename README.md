@@ -52,7 +52,7 @@ To test the system immediately, use the following credentials:
 Ensure the `data` folder is in the same directory as the `.jar` file.
 
 ```bash
-java -jar <YourGroupNumber>.jar
+java -jar 12.jar
 ```
 
 ### Option 2: Compiling from Source
