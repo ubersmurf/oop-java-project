@@ -51,15 +51,24 @@ public class ReservationManager {
         }
     }
 
-    private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, double basePrice) {
+private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, double basePrice) {
         if (seat.isOccupied()) {
             return false;
         }
 
         try { Thread.sleep(10); } catch (InterruptedException e) {}
 
-        double price = priceCalculator.calculate(seat, basePrice);
         
+        // 750 TL ile 1500 TL arasında rastgele bir taban fiyat belirle
+        double minPrice = 750.0;
+        double maxPrice = 1500.0;
+        double randomBase = minPrice + (Math.random() * (maxPrice - minPrice));
+        
+        // Fiyatı virgülden sonra 2 basamak olacak şekilde yuvarla (Örn: 1245.50 TL)
+        randomBase = Math.round(randomBase * 100.0) / 100.0;
+
+        double price = priceCalculator.calculate(seat, randomBase);
+                
         String pnr = "PNR-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         
         Reservation newRes = new Reservation(pnr, flight, passenger, seat);
@@ -78,26 +87,32 @@ public class ReservationManager {
         
         return true;
     }
-
+    
     public synchronized void cancelReservation(String resCode) {
         Reservation found = null;
+        
         for (Reservation r : reservations) {
-            if (r.getReservationCode().equals(resCode) && r.isActive()) {
+            if (r.getReservationCode().equals(resCode)) {
                 found = r;
                 break;
             }
         }
 
         if (found != null) {
-            found.cancel();
             found.getSeat().setOccupied(false);
-            System.out.println("Rezervasyon iptal edildi: " + resCode);
+            
+            reservations.remove(found);
+            
+            tickets.removeIf(t -> t.getReservation().getReservationCode().equals(resCode));
+
+            System.out.println("Rezervasyon ve bilet sistemden tamamen silindi: " + resCode);
+            
             saveData();
         } else {
-            System.out.println("Aktif rezervasyon bulunamadı: " + resCode);
+            System.out.println("Rezervasyon bulunamadı: " + resCode);
         }
     }
-
+    
     public List<Reservation> getReservationsByPassenger(String passengerID) {
         return reservations.stream()
                 .filter(r -> r.getPassenger().getPassengerID().equals(passengerID))

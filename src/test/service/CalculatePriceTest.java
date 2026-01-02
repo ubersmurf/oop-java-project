@@ -1,15 +1,16 @@
-package service;
+package test.service;
 
 import model.Seat;
 import model.SeatType;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import service.CalculatePrice;
 
-class CalculatePriceTest {
+public class CalculatePriceTest {
 
     // 1. TEST: Business Class Fiyat Hesaplama
     @Test
-    void testCalculate_BusinessClass() {
+    public void testCalculate_BusinessClass() {
         // Hazırlık
         CalculatePrice calculator = new CalculatePrice();
         // Fiyatı etkilemeyen parametreleri boş geçebiliriz (null), önemli olan SeatType
@@ -25,7 +26,7 @@ class CalculatePriceTest {
 
     // 2. TEST: Economy Class Fiyat Hesaplama
     @Test
-    void testCalculate_EconomyClass() {
+    public void testCalculate_EconomyClass() {
         // Hazırlık
         CalculatePrice calculator = new CalculatePrice();
         Seat economySeat = new Seat("10A", SeatType.ECONOMY, 0);
@@ -40,7 +41,7 @@ class CalculatePriceTest {
 
     // 3. TEST: Bagaj Ücreti (Sınırın Altında)
     @Test
-    void testCalculateBaggageFee_UnderLimit() {
+    public void testCalculateBaggageFee_UnderLimit() {
         // Hazırlık
         CalculatePrice calculator = new CalculatePrice();
         double weight = 20.0; // 23kg altı
@@ -54,7 +55,7 @@ class CalculatePriceTest {
 
     // 4. TEST: Bagaj Ücreti (Sınırın Üstünde)
     @Test
-    void testCalculateBaggageFee_OverLimit() {
+    public void testCalculateBaggageFee_OverLimit() {
         // Hazırlık
         CalculatePrice calculator = new CalculatePrice();
         double weight = 25.0; // 23kg'dan 2 kilo fazla

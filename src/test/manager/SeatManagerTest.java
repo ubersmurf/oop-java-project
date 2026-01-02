@@ -1,7 +1,8 @@
-package manager;
+package test.manager;
 
 import model.Flight;
 import model.Plane;
+import manager.SeatManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,13 +10,13 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SeatManagerTest {
+public class SeatManagerTest {
 
     private SeatManager seatManager;
     private Flight flight;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         seatManager = new SeatManager();
 
         // Test için küçük bir uçak oluşturuyoruz (2 sıra, 6 sütun = 12 koltuk)
@@ -33,7 +34,7 @@ class SeatManagerTest {
      * after a seat has been reserved."
      */
     @Test
-    void testEmptySeatCountDecreases() {
+    public void testEmptySeatCountDecreases() {
         // 1. Başlangıçtaki boş koltuk sayısını al (12 olmalı)
         int initialEmptySeats = seatManager.getEmptySeatCount(flight);
 
@@ -54,7 +55,7 @@ class SeatManagerTest {
      * PDF Kuralı: "Test the Exception thrown when trying to book a non-existent seat number."
      */
     @Test
-    void testExceptionForNonExistentSeat() {
+    public void testExceptionForNonExistentSeat() {
         // Uçağımız 12 kişilik (2 sıra). Biz 50. sırayı istersek hata vermeli.
 
         // assertThrows metodu, içindeki kodun hata fırlatmasını bekler.

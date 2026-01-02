@@ -130,14 +130,7 @@ public class ReservationFrame extends JFrame {
             "İptal Onayı", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            // ReservationManager'a silme metodu eklememiz gerekecek
-            // Şimdilik listeyi yeniden yükleyerek simüle edelim,
-            // ama doğru yöntem Manager'dan silmektir.
-            
-            // reservationManager.cancelReservation(resId); <--- Bunu Manager'a ekleyeceğiz
-            
-            // Eğer managerda cancel metodu yoksa, veriyi silmek için bir trick (veya manager güncellemesi) lazım.
-            // Şimdilik GUI'den kaldırıyoruz:
+            reservationManager.cancelReservation(resId);
             tableModel.removeRow(selectedRow);
             JOptionPane.showMessageDialog(this, "İşlem (Simülasyon) Başarılı: Kayıt listeden kaldırıldı.");
         }

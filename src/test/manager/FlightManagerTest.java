@@ -1,7 +1,8 @@
-package manager;
+package test.manager;
 
 import model.Flight;
 import model.Plane;
+import manager.FlightManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,13 +12,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FlightManagerTest {
+public class FlightManagerTest {
 
     private FlightManager flightManager;
     private Plane testPlane;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         // Her testten önce temiz bir yönetici ve uçak oluşturuyoruz
         flightManager = new FlightManager();
         testPlane = new Plane("P001", "Boeing 737", 100);
@@ -28,7 +29,7 @@ class FlightManagerTest {
      * for the given departure/arrival cities."*/
 
     @Test
-    void testSearchFlight_FiltersByCityCorrectly() {
+    public void testSearchFlight_FiltersByCityCorrectly() {
         // 1. Hazırlık: Gelecek tarihe bir uçuş ekle (Yarın)
         Date futureDate = getDate(1); // +1 gün
 
@@ -53,7 +54,7 @@ class FlightManagerTest {
     /*
      * PDF İsteği 2: "Test the process of eliminating flights whose departure time has passed."*/
     @Test
-    void testSearchFlight_EliminatesPassedFlights() {
+    public void testSearchFlight_EliminatesPassedFlights() {
         // 1. Hazırlık: Biri GEÇMİŞ, biri GELECEK tarihli iki uçuş oluştur
         Date pastDate = getDate(-5);   // 5 gün önce (Geçmiş)
         Date futureDate = getDate(5);  // 5 gün sonra (Gelecek)

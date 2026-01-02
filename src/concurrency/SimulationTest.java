@@ -1,15 +1,16 @@
-package concurrency; // Dosya test/concurrency içinde olduğu için paketi bu olmalı
-
+package concurrency;
 // Diğer paketlerdeki sınıfları içeri alıyoruz
 import manager.ReservationManager;
 import model.*; // Flight, Seat, Passenger, SeatType vb. buradan gelir
-// import concurrency.PassengerThread; // Aynı pakette (concurrency) oldukları için bunu yazmasak da görür ama yazsak da zarar gelmez.
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class SimulationTest {
     public static void main(String[] args) throws InterruptedException {
@@ -18,15 +19,11 @@ public class SimulationTest {
         // 1. YÖNETİCİYİ OLUŞTUR
         ReservationManager manager = new ReservationManager();
 
-        // 2. UÇUŞU OLUŞTUR (Flight constructor hatası alırsan burayı kendi Flight sınıfına göre güncelle)
-        // Örnek: Flight(id, nereden, nereye, tarih, saat, kapasite, fiyat)
-        // Eğer senin Flight sınıfında constructor farklıysa parantez içini ona göre düzelt.
         Flight flight = new Flight("TK-1923", "IST", "ANK", null, null, 180, null);
 
         // 3. KOLTUKLARI OLUŞTUR (180 Adet)
         List<Seat> seats = new ArrayList<>();
         for (int i = 1; i <= 180; i++) {
-            // SeatType.ECONOMY çalışmazsa model.SeatType olarak dene veya importları kontrol et
             seats.add(new Seat("S-" + i, SeatType.ECONOMY, 1000.0));
         }
 

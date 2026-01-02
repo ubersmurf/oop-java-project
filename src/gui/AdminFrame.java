@@ -154,7 +154,6 @@ public class AdminFrame extends JFrame {
 
     private void addFlight() {
         txtFlightNo.setEditable(true); // Ekleme modunda ID girilebilir
-        // ... (Eski addFlight kodunun aynısı) ...
         try {
             SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
@@ -205,7 +204,6 @@ public class AdminFrame extends JFrame {
     }
 
     private void deleteFlight() {
-        // ... (Eski deleteFlight kodunun aynısı) ...
         int selectedRow = flightTable.getSelectedRow();
         if (selectedRow != -1) {
             String flightNo = (String) tableModel.getValueAt(selectedRow, 0);
@@ -215,7 +213,6 @@ public class AdminFrame extends JFrame {
     }
 
     private void refreshTable() {
-        // ... (Eski refreshTable kodunun aynısı) ...
         tableModel.setRowCount(0);
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
