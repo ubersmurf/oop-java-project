@@ -81,5 +81,5 @@ The project includes **5+ JUnit tests** verifying critical business logic:
 ---
 
 ## 👥 Contributors
-* **Name Surname** (Student ID)
-* **Taha** (Student ID)
+* **Halis Kaya** (24011085)
+* **Taha Efe Tan** (24011080)
