@@ -2,7 +2,8 @@ package manager;
 
 import model.Flight;
 import model.Plane;
-import util.FileHelper; // FileHelper eklendi
+import model.Seat;
+import util.FileHelper;
 
 import java.io.*;
 import java.util.*;
@@ -13,13 +14,11 @@ public class FlightManager {
 
     public FlightManager() {
         this.flights = new ArrayList<>();
-        // Klasör kontrolünü FileHelper üzerinden yapıyoruz
         checkDataDirectory();
         loadFlightsFromFile();
     }
 
     private void checkDataDirectory() {
-        // FileHelper ile doğru konumu buluyoruz
         File file = FileHelper.getFile(DATA_FILE);
         if (file.getParentFile() != null && !file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -103,7 +102,11 @@ public class FlightManager {
         return null;
     }
 
+    // --- GÜNCELLENEN METOT ---
     public List<Flight> searchFlight(String dep, String arr, Date date) {
+        // HER ARAMADA DOSYADAN GÜNCEL VERİYİ ÇEK (CRITICAL FIX)
+        loadFlightsFromFile();
+        
         List<Flight> result = new ArrayList<>();
         Calendar searchCal = Calendar.getInstance();
         searchCal.setTime(date);
@@ -127,9 +130,45 @@ public class FlightManager {
         return result;
     }
 
+    // --- YENİ EKLENEN METOT (KİLİTLEME) ---
+    // Rezervasyon yapıldığında koltuğu 'dolu' olarak işaretleyip kaydeder.
+    public void occupySeat(String flightNum, String seatNum) {
+        loadFlightsFromFile(); // En güncel hali al
+        for (Flight f : flights) {
+            if (f.getFlightNum().equals(flightNum)) {
+                for (Seat s : f.getSeats()) {
+                    if (s.getSeatNum().equals(seatNum)) {
+                        s.setOccupied(true);
+                        System.out.println("FlightManager: " + flightNum + " uçuşundaki " + seatNum + " koltuğu kilitlendi.");
+                        break;
+                    }
+                }
+                saveFlightsToFile();
+                return;
+            }
+        }
+    }
+
+    // --- GÜNCELLENEN METOT (BOŞALTMA) ---
+    public void freeSeat(String flightNum, String seatNum) {
+        loadFlightsFromFile(); // En güncel hali al
+        for (Flight f : flights) {
+            if (f.getFlightNum().equals(flightNum)) {
+                for (Seat s : f.getSeats()) {
+                    if (s.getSeatNum().equals(seatNum)) {
+                        s.setOccupied(false);
+                        System.out.println("FlightManager: " + flightNum + " uçuşundaki " + seatNum + " koltuğu boşa çıkarıldı.");
+                        break;
+                    }
+                }
+                saveFlightsToFile(); // Değişikliği flights.dat dosyasına kaydet
+                return;
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public void loadFlightsFromFile() {
-        // BURASI DEĞİŞTİ: FileHelper kullanıldı
         File file = FileHelper.getFile(DATA_FILE);
         if (!file.exists()) return;
 
@@ -146,7 +185,6 @@ public class FlightManager {
     public void saveFlightsToFile() {
         try {
             checkDataDirectory();
-            // BURASI DEĞİŞTİ: FileHelper kullanıldı
             File file = FileHelper.getFile(DATA_FILE);
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
                 oos.writeObject(flights);

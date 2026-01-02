@@ -2,7 +2,7 @@ package manager;
 
 import model.*;
 import service.CalculatePrice;
-import util.FileHelper; // FileHelper eklendi
+import util.FileHelper;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ public class ReservationManager {
         this.reservations = new ArrayList<>();
         this.tickets = new ArrayList<>();
 
-        // Klasör kontrolü (FileHelper ile)
         File file = FileHelper.getFile(RES_FILE);
         if (file.getParentFile() != null && !file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
@@ -51,20 +50,17 @@ public class ReservationManager {
         }
     }
 
-private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, double basePrice) {
+    private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, double basePrice) {
         if (seat.isOccupied()) {
             return false;
         }
 
         try { Thread.sleep(10); } catch (InterruptedException e) {}
-
         
-        // 750 TL ile 1500 TL arasında rastgele bir taban fiyat belirle
+        // 750 TL ile 1500 TL arasında rastgele bir taban fiyat
         double minPrice = 750.0;
         double maxPrice = 1500.0;
         double randomBase = minPrice + (Math.random() * (maxPrice - minPrice));
-        
-        // Fiyatı virgülden sonra 2 basamak olacak şekilde yuvarla (Örn: 1245.50 TL)
         randomBase = Math.round(randomBase * 100.0) / 100.0;
 
         double price = priceCalculator.calculate(seat, randomBase);
@@ -83,7 +79,13 @@ private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, 
         
         System.out.println("İşlem Başarılı: " + pnr + " | Fiyat: " + price + " TL");
 
-        saveData();
+        saveData(); // Rezervasyonu kaydet
+        
+        // --- SENKRONİZASYON FIX ---
+        // Asıl uçuş dosyasındaki (flights.dat) koltuğu da güncelle!
+        FlightManager flightManager = new FlightManager();
+        flightManager.occupySeat(flight.getFlightNum(), seat.getSeatNum());
+        // --------------------------
         
         return true;
     }
@@ -91,6 +93,7 @@ private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, 
     public synchronized void cancelReservation(String resCode) {
         Reservation found = null;
         
+        // 1. Silinecek rezervasyonu bul
         for (Reservation r : reservations) {
             if (r.getReservationCode().equals(resCode)) {
                 found = r;
@@ -99,15 +102,23 @@ private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, 
         }
 
         if (found != null) {
-            found.getSeat().setOccupied(false);
-            
+            // Uçuş ve Koltuk bilgilerini al (Silmeden önce)
+            String flightNum = found.getFlight().getFlightNum();
+            String seatNum = found.getSeat().getSeatNum();
+
+            // 2. Rezervasyonu listeden sil
             reservations.remove(found);
-            
             tickets.removeIf(t -> t.getReservation().getReservationCode().equals(resCode));
 
-            System.out.println("Rezervasyon ve bilet sistemden tamamen silindi: " + resCode);
+            System.out.println("Rezervasyon ve bilet sistemden silindi: " + resCode);
             
+            // 3. Rezervasyon dosyasını güncelle
             saveData();
+            
+            // 4. FlightManager'ı çağır ve ASIL uçuş dosyasındaki koltuğu boşalt
+            FlightManager flightManager = new FlightManager();
+            flightManager.freeSeat(flightNum, seatNum);
+
         } else {
             System.out.println("Rezervasyon bulunamadı: " + resCode);
         }
@@ -121,7 +132,6 @@ private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, 
 
     private void saveData() {
         try {
-            // BURASI DEĞİŞTİ: FileHelper
             File file = FileHelper.getFile(RES_FILE);
             if (file.getParentFile() != null && !file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -138,7 +148,6 @@ private boolean applyReservation(Passenger passenger, Flight flight, Seat seat, 
 
     @SuppressWarnings("unchecked")
     private void loadData() {
-        // BURASI DEĞİŞTİ: FileHelper
         File file = FileHelper.getFile(RES_FILE);
         if (!file.exists()) return;
 

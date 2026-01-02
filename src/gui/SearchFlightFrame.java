@@ -13,6 +13,8 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import service.CalculatePrice;
+
 public class SearchFlightFrame extends JFrame {
 
     private JComboBox<String> cmbFrom;
@@ -127,11 +129,16 @@ public class SearchFlightFrame extends JFrame {
             tableModel.setRowCount(0);
             SimpleDateFormat tFormat = new SimpleDateFormat("HH:mm");
 
+            CalculatePrice priceCalculator = new CalculatePrice();
+
             for (Flight f : foundFlights) {
+                double randomPrice = priceCalculator.getRandomBasePrice();
+        
+                String formattedPrice = String.format("%.2f TL", randomPrice);
                 Object[] row = {
                     f.getFlightNum(), f.getDeparturePlace(), f.getArrivalPlace(),
                     df.format(f.getDate()), tFormat.format(f.getHour()),
-                    "1000.0 TL", "180"
+                    formattedPrice, f.getAvailableSeatCount()
                 };
                 tableModel.addRow(row);
             }

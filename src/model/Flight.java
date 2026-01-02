@@ -5,12 +5,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Flight implements Serializable {
     private String flightNum;
     private String departurePlace;
     private String arrivalPlace;
     private Date date; // Tarih
     private Date hour; // Saat (Sadece zaman bilgisini tutacak)
+    private int duration; // Dakika cinsinden
+    private Plane plane;
     
     public void setDeparturePlace(String departurePlace) {
         this.departurePlace = departurePlace;
@@ -28,8 +33,7 @@ public class Flight implements Serializable {
         return duration;
     }
 
-    private int duration; // Dakika cinsinden
-    private Plane plane;
+
 
     public Flight(String flightNum, String dep, String arr, Date date, Date hour, int duration, Plane plane) {
         this.flightNum = flightNum;
@@ -98,6 +102,23 @@ public class Flight implements Serializable {
     }
     public void setFlightNum(String flightNum) {
         this.flightNum = flightNum;
+    }
+
+    public List<Seat> getSeats() {
+        List<Seat> allSeats = new ArrayList<>();
+        
+        if (this.plane != null && this.plane.getSeatMatrix() != null) {
+            // Matrisi (Satır ve Sütunları) dolaş
+            for (Seat[] row : this.plane.getSeatMatrix()) {
+                for (Seat s : row) {
+                    // Boş olmayan (var olan) koltukları listeye ekle
+                    if (s != null) {
+                        allSeats.add(s);
+                    }
+                }
+            }
+        }
+        return allSeats;
     }
 
     //
