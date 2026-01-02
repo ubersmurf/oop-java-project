@@ -1,66 +1,85 @@
-# ✈️ Airline Reservation and Management System
+# ✈️ YTÜ Airline Reservation System
 
 ## 📘 Project Description
-This project is an **Airline Reservation and Management System** developed for the  
-**BLM2012 – Object Oriented Programming** course (2025–2026 Fall Semester).
+This project is a comprehensive **Airline Reservation and Management System** developed for the **BLM2012 – Object Oriented Programming** course (2025–2026 Fall Semester).
 
-The system models a real-world airline operation using **Java**, focusing on object-oriented design, concurrency, and software engineering principles.
-
----
-
-## 🎯 Objectives
-- Apply core **Object-Oriented Programming (OOP)** principles  
-- Implement **multithreading and concurrency control**  
-- Execute **asynchronous tasks** without blocking the GUI  
-- Design a modular and maintainable architecture  
-- Verify business logic using **JUnit 5**
+The application simulates a real-world airline operation using **Java Swing** for the GUI, **Multithreading** for simulation scenarios, and **File I/O** for data persistence. It allows users to book flights, select seats visually, and enables administrators to manage flight schedules.
 
 ---
 
-## 🧩 System Modules
-- **Flight Management** ✈️  
-  Plane, flight, route, and seat structures  
+## 🚀 Quick Start (Login Credentials)
+To test the system immediately, use the following credentials:
 
-- **Reservation & Ticketing** 🎫  
-  Passenger, reservation, ticket, and baggage handling  
-
-- **Service Layer** ⚙️  
-  Seat allocation, flight management, and price calculation  
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Admin / Staff** | `admin` | `1234` |
+| **Passenger** | *(No login required, enter Name/ID)* | - |
 
 ---
 
-## 🔄 Concurrency Implementation
-- **Simultaneous Seat Reservation**  
-  Multiple passenger threads attempt to reserve seats, demonstrating synchronized and unsynchronized execution.
+## 🎯 Key Features
 
-- **Asynchronous Report Generation**  
-  Long-running report tasks are executed in a separate thread while keeping the GUI responsive.
+### 1. 🖥️ Graphical User Interface (Swing)
+* **Multi-Tab Login Screen:** Separate access for Passengers, Staff, and Simulation Mode.
+* **Visual Seat Selection:** Interactive seat map (Green: Empty, Red: Occupied).
+* **Admin Panel:** Add, Delete, and Update flight details (Date/Time).
+* **Reservation Management:** View and cancel existing bookings.
 
----
+### 2. 🔄 Concurrency & Simulation (Scenario 1 & 2)
+* **Simulation Mode:** A dedicated screen demonstrating **90 concurrent threads** competing for 180 seats.
+    * Includes a "Safe Mode" checkbox to toggle synchronization.
+    * Visualizes thread activities in real-time.
+* **Asynchronous Reporting:** Background tasks (Scenario 2) run without freezing the UI.
 
-## 🧪 Testing
-The project includes **JUnit 5** unit tests for:
-- Ticket price calculation 💰  
-- Flight search and filtering 🔍  
-- Seat availability and exception handling 💺  
-
----
-
-## 🖥️ Graphical User Interface
-The application provides a GUI (JavaFX / Swing) including:
-- Login screen  
-- Flight search and booking  
-- Reservation management  
-- Admin / staff management  
+### 3. 💾 Data Persistence
+* Uses **Java Serialization** to store objects (`Flight`, `Reservation`, `Passenger`).
+* Data is saved locally in the `data/` directory (e.g., `flights.dat`).
+* **Note:** The system remembers your changes even after restarting!
 
 ---
 
-## 💾 Data Storage
-- File-based data persistence 📂  
-- No database or XML usage  
+## 🛠️ Tech Stack
+* **Language:** Java (JDK 17+)
+* **GUI:** Java Swing (Nimbus LookAndFeel)
+* **Testing:** JUnit 5
+* **Data:** File-based (.dat files)
 
 ---
 
 ## ▶️ How to Run
+
+### Option 1: Using the Executable JAR
+Ensure the `data` folder is in the same directory as the `.jar` file.
+
 ```bash
-java -jar <groupNumber>.jar
+java -jar <YourGroupNumber>.jar
+```
+
+### Option 2: Compiling from Source
+If you want to compile the code yourself:
+
+```bash
+# Compile (Windows/Linux/Mac)
+javac -cp "lib/*" -d bin -sourcepath src src/gui/LoginFrame.java
+
+# Run (Windows uses ';', Mac/Linux uses ':')
+# Windows:
+java -cp "bin;lib/*" gui.LoginFrame
+
+# Mac/Linux:
+java -cp "bin:lib/*" gui.LoginFrame
+```
+
+---
+
+## 🧪 Unit Testing
+The project includes **5+ JUnit tests** verifying critical business logic:
+* ✅ **Price Calculation:** Business vs. Economy pricing logic.
+* ✅ **Search Engine:** Filtering by route and date validation.
+* ✅ **Seat Manager:** Availability counters and exception handling.
+
+---
+
+## 👥 Contributors
+* **Name Surname** (Student ID)
+* **Taha** (Student ID)
