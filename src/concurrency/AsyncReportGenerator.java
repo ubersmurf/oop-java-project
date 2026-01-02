@@ -28,7 +28,6 @@ public class AsyncReportGenerator {
                 for (Flight f : flights) {
                     sb.append("Uçuş No: ").append(f.getFlightNum())
                             .append(" | Rota: ").append(f.getDeparturePlace()).append(" -> ").append(f.getArrivalPlace())
-                            .append(" | Boş Koltuk: ").append(f.getAvailableSeatCount())
                             .append("\n");
                 }
                 sb.append("===========================\n");

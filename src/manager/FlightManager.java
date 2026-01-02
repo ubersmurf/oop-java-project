@@ -2,18 +2,28 @@ package manager;
 
 import model.Flight;
 import model.Plane;
+import util.FileHelper; // FileHelper eklendi
 
 import java.io.*;
 import java.util.*;
 
 public class FlightManager {
     private List<Flight> flights;
-    // Dosya yolunu 'data' klasörü içine yönlendirdik
     private final String DATA_FILE = "data/flights.dat";
 
     public FlightManager() {
         this.flights = new ArrayList<>();
-        loadFlightsFromFile(); // Başlangıçta verileri yükle
+        // Klasör kontrolünü FileHelper üzerinden yapıyoruz
+        checkDataDirectory();
+        loadFlightsFromFile();
+    }
+
+    private void checkDataDirectory() {
+        // FileHelper ile doğru konumu buluyoruz
+        File file = FileHelper.getFile(DATA_FILE);
+        if (file.getParentFile() != null && !file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
     }
 
     public void addFlight(Flight flight) {
@@ -24,7 +34,7 @@ public class FlightManager {
             }
         }
         flights.add(flight);
-        saveFlightsToFile(); // Değişikliği kaydet
+        saveFlightsToFile();
     }
 
     public void removeFlight(String flightNum) {
@@ -45,7 +55,7 @@ public class FlightManager {
             flight.setDate(newDate);
             flight.setHour(newHour);
             System.out.println(flightNum + " numaralı uçuşun zamanı güncellendi.");
-            saveFlightsToFile(); // Değişikliği dosyaya kaydet
+            saveFlightsToFile();
             return true;
         }
         System.out.println("Güncelleme başarısız: Uçuş bulunamadı.");
@@ -54,13 +64,12 @@ public class FlightManager {
 
     public void updateFlightSeats(Flight updatedFlight) {
         for (int i = 0; i < flights.size(); i++) {
-            // ID eşleşiyorsa, listedeki eski uçuşu yenisiyle değiştir
             if (flights.get(i).getFlightNum().equals(updatedFlight.getFlightNum())) {
                 flights.set(i, updatedFlight);
                 break;
             }
         }
-        saveFlightsToFile(); // Dosyaya kalıcı olarak kaydet (flights.dat)
+        saveFlightsToFile();
     }
 
     public boolean updateFlightDuration(String flightNum, int newDuration) {
@@ -94,9 +103,6 @@ public class FlightManager {
         return null;
     }
 
-    /**
-     * Kalkış, varış ve tarihe göre uçuş arama.
-     */
     public List<Flight> searchFlight(String dep, String arr, Date date) {
         List<Flight> result = new ArrayList<>();
         Calendar searchCal = Calendar.getInstance();
@@ -123,8 +129,8 @@ public class FlightManager {
 
     @SuppressWarnings("unchecked")
     public void loadFlightsFromFile() {
-        File file = new File(DATA_FILE);
-        // Eğer dosya yoksa (henüz veri girilmediyse) metoddan çık
+        // BURASI DEĞİŞTİ: FileHelper kullanıldı
+        File file = FileHelper.getFile(DATA_FILE);
         if (!file.exists()) return;
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -137,15 +143,11 @@ public class FlightManager {
         }
     }
 
-    // --- DÜZELTİLEN METOT BURADA (ESKİSİ SİLİNDİ) ---
     public void saveFlightsToFile() {
         try {
-            File file = new File(DATA_FILE);
-            // Eğer "data" klasörü yoksa, önce onu oluştur
-            if (file.getParentFile() != null && !file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-
+            checkDataDirectory();
+            // BURASI DEĞİŞTİ: FileHelper kullanıldı
+            File file = FileHelper.getFile(DATA_FILE);
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
                 oos.writeObject(flights);
             }
