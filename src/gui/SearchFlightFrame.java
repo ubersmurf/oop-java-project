@@ -27,6 +27,10 @@ public class SearchFlightFrame extends JFrame {
     private FlightManager flightManager;
     private List<Flight> foundFlights; // Arama sonuçları
 
+    private CalculatePrice priceCalculator = new CalculatePrice();
+    private double randomPrice;
+
+
     public SearchFlightFrame() {
         flightManager = new FlightManager(); // Manager'ı yükle
 
@@ -129,11 +133,9 @@ public class SearchFlightFrame extends JFrame {
             tableModel.setRowCount(0);
             SimpleDateFormat tFormat = new SimpleDateFormat("HH:mm");
 
-            CalculatePrice priceCalculator = new CalculatePrice();
 
             for (Flight f : foundFlights) {
-                double randomPrice = priceCalculator.getRandomBasePrice();
-        
+                randomPrice = priceCalculator.getRandomBasePrice();
                 String formattedPrice = String.format("%.2f TL", randomPrice);
                 Object[] row = {
                     f.getFlightNum(), f.getDeparturePlace(), f.getArrivalPlace(),
@@ -168,7 +170,7 @@ public class SearchFlightFrame extends JFrame {
                 // ESKİSİ: new MainFrame().setVisible(true); // Simülasyondu
                 
                 // YENİSİ: Gerçek rezervasyon ekranını açıyoruz
-                new SeatSelectionFrame(selectedFlight).setVisible(true);
+                new SeatSelectionFrame(selectedFlight, randomPrice).setVisible(true);
             });
         }
 }
